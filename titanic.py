@@ -13,16 +13,24 @@ from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.metrics import confusion_matrix
+import argparse
 
-N_TREES = 20
+
+parser = argparse.ArgumentParser(description="Entrainement modèle Titanic")
+parser.add_argument(
+    "--n_trees", type=int, default=20, help="Taille des arbres"
+)
+args = parser.parse_args()
+
+N_TREES = args.n_trees
 MAX_DEPTH = None
 MAX_FEATURES = "sqrt"
 JETON_API = "$trotskitueleski1917"
-
+print("Valeur de N_trees",N_TREES)
 
 # IMPORT ET EXPLORATION DONNEES --------------------------------
 
-TrainingData = pd.read_csv("data.csv")
+TrainingData = pd.read_csv("./data.csv")
 
 
 TrainingData["Ticket"].str.split("/").str.len()
