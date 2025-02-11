@@ -53,19 +53,50 @@ from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.metrics import confusion_matrix
 
-N_TREES = 20
+from dotenv import load_dotenv
+import argparse
+import os
+load_dotenv()
+
+parser = argparse.ArgumentParser(description="taille de l'arbre")
+parser.add_argument(
+    "--n_trees", type=int, default=20, help="taille de l'arbre"
+)
+args = parser.parse_args()
+print(args.n_trees)
+
+N_TREES = args.n_trees
 MAX_DEPTH = None
 MAX_FEATURES = "sqrt"
-JETON_API = "$trotskitueleski1917"
+JETON_API = os.environ["JETON_API"]
 
+
+if JETON_API.startswith("$"):
+    print("API token has been configured properly")
+else:
+    print("API token has not been configured")
+
+
+def exploration_code(colonne,sign):
+    colonne.str.split(sign).str.len()
+
+def split_and_save_data(data, target_column, test_size, train_path="train.csv", test_path="test.csv"):
+    y=data[target_column]
+    X = data.drop(target_column, axis="columns")
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size)
+    pd.concat([X_train, y_train]).to_csv(train_path)
+    pd.concat([X_test, y_test]).to_csv(test_path)
+    return X_train,X_test,y_train,y_test
 
 # IMPORT ET EXPLORATION DONNEES --------------------------------
 
 TrainingData = pd.read_csv("data.csv")
 
+exploration_code(TrainingData["Ticket"],"/")
+exploration_code(TrainingData["Name"],",")
 
-TrainingData["Ticket"].str.split("/").str.len()
-TrainingData["Name"].str.split(",").str.len()
+#TrainingData["Ticket"].str.split("/").str.len()
+#TrainingData["Name"].str.split(",").str.len()
 
 TrainingData.isnull().sum()
 
@@ -90,16 +121,10 @@ plt.show()
 # On _split_ notre _dataset_ d'apprentisage
 # Prenons arbitrairement 10% du dataset en test et 90% pour l'apprentissage.
 
-y = TrainingData["Survived"]
-X = TrainingData.drop("Survived", axis="columns")
-
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
-pd.concat([X_train, y_train]).to_csv("train.csv")
-pd.concat([X_test, y_test]).to_csv("test.csv")
-
+X_train,X_test,y_train,y_test=split_and_save_data(TrainingData,"Survived",0.1)
 
 # PIPELINE ----------------------------
-
+def pipeline_model(n_trees,numeric,categorical)
 # Définition des variables
 numeric_features = ["Age", "Fare"]
 categorical_features = ["Embarked", "Sex"]
